@@ -1,4 +1,4 @@
-from fastapi import FastAPI, WebSocket
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 import requests
 import os
 import json
@@ -8,16 +8,17 @@ app = FastAPI()
 
 OLLAMA_API = os.getenv("OLLAMA_API_BASE", "http://ollama:11434")
 
+# Preload multiple AI models
 PRELOAD_MODELS = ["mistral", "llama2", "gemma"]
 
 async def preload_models():
     for model in PRELOAD_MODELS:
-        print(f" Preloading model: {model}...")
+        print(f"Preloading model: {model}...")
         response = requests.post(f"{OLLAMA_API}/api/pull", json={"name": model})
         if response.status_code == 200:
-            print(f" Model {model} preloaded successfully!")
+            print(f"Model {model} preloaded successfully!")
         else:
-            print(f"⚠️ Failed to preload {model}: {response.text}")
+            print(f"Failed to preload {model}: {response.text}")
 
 @app.on_event("startup")
 async def startup_event():
@@ -31,11 +32,10 @@ async def websocket_endpoint(websocket: WebSocket):
             data = await websocket.receive_text()
             request_data = json.loads(data)
             prompt = request_data.get("prompt", "Hello!")
-            model = request_data.get("model", "mistral")  
+            model = request_data.get("model", "mistral")  # Default to Mistral
 
-            print(f"🔍 User request: Model={model}, Prompt={prompt}")
+            print(f"User request: Model={model}, Prompt={prompt}")
 
-            
             response = requests.post(
                 f"{OLLAMA_API}/api/generate",
                 json={"model": model, "prompt": prompt},
@@ -49,10 +49,12 @@ async def websocket_endpoint(websocket: WebSocket):
                         await websocket.send_text(chunk["response"])
                     if chunk.get("done", False):
                         break
+    except WebSocketDisconnect:
+        print("WebSocket client disconnected")
     except Exception as e:
-        print(f" Error: {e}")
+        print(f"Error: {e}")
         await websocket.close()
 
 @app.get("/")
 async def root():
-    return {"message": "Ollama WebSocket API is running!"}
+    return {"message": "✅ Ollama WebSocket API is running!"}
