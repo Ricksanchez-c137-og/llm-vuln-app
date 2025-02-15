@@ -6,11 +6,11 @@ services:
     container_name: ollama
     restart: always
     ports:
-      - "11434:11434" 
+      - "11434:11434"
     networks:
       - backend
     volumes:
-      - ./entrypoint.sh:/entrypoint.sh  
+      - ./entrypoint.sh:/entrypoint.sh 
     entrypoint: ["/bin/sh", "/entrypoint.sh"]
 
   vuln-llm:
