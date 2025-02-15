@@ -1,25 +1,22 @@
 #!/bin/sh
 set -e
 
-# Check if Ollama is already running
-if pgrep -f "ollama serve" > /dev/null; then
-  echo "✅ Ollama is already running, skipping startup..."
-else
-  echo "🚀 Starting Ollama in the background..."
-  ollama serve &
-fi
+echo "🚀 Starting Ollama server..."
+ollama serve &
 
-# Wait for Ollama to be fully ready
-until ollama list | grep -q "mistral"; do
-  echo "⏳ Waiting for Ollama to be fully ready..."
+# Wait for Ollama API to become available
+until curl -s http://127.0.0.1:11434/api/tags > /dev/null; do
+  echo "⏳ Waiting for Ollama to start..."
   sleep 2
 done
 
-# Pull Mistral if it's not installed
-if ! ollama list | grep -q "mistral"; then
-  echo "🔄 Pulling Mistral model..."
-  ollama pull mistral
-fi
+# Pull required models
+echo "🚀 Pulling AI models..."
+ollama pull mistral
+ollama pull llama2
+ollama pull gemma
 
-echo "✅ Ollama is ready!"
-exec tail -f /dev/null  # Keep container running
+echo "✅ Models pulled successfully. Ollama is ready!"
+
+# Keep Ollama in the foreground
+wait
