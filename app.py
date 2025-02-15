@@ -56,4 +56,4 @@ async def websocket_endpoint(websocket: WebSocket):
 
 @app.get("/")
 async def root():
-    return {"message": "✅ Ollama WebSocket API is running!"}
+    return {"message": "Ollama WebSocket API is running!"}
