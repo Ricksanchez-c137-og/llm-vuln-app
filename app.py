@@ -12,16 +12,16 @@ PRELOAD_MODELS = ["mistral", "llama2", "gemma"]
 
 async def preload_models():
     for model in PRELOAD_MODELS:
-        print(f"🔄 Preloading model: {model}...")
+        print(f"Preloading model: {model}...")
 
         try:
             response = requests.post(f"{OLLAMA_API}/api/pull", json={"name": model}, timeout=300)
             if response.status_code == 200:
-                print(f"✅ Model {model} preloaded successfully!")
+                print(f"Model {model} preloaded successfully!")
             else:
                 print(f"Failed to preload {model}: {response.status_code} - {response.text}")
         except requests.exceptions.RequestException as e:
-            print(f" Error connecting to Ollama while preloading model {model}: {e}")
+            print(f"Error connecting to Ollama while preloading model {model}: {e}")
 
 @app.on_event("startup")
 async def startup_event():
@@ -34,19 +34,19 @@ async def websocket_endpoint(websocket: WebSocket):
     try:
         while True:
             data = await websocket.receive_text()
+            print(f"Raw WebSocket Data: {data}")
 
             try:
                 request_data = json.loads(data)
                 prompt = request_data.get("prompt", "Hello!")
                 model = request_data.get("model", "mistral")
-
-                print(f"Received request: Model={model}, Prompt={prompt}")
+                print(f"Parsed JSON: Model={model}, Prompt={prompt}")
 
                 response = requests.post(
                     f"{OLLAMA_API}/api/generate",
                     json={"model": model, "prompt": prompt},
                     stream=True,
-                    timeout=300 
+                    timeout=300
                 )
 
                 if response.status_code != 200:
@@ -63,12 +63,9 @@ async def websocket_endpoint(websocket: WebSocket):
                         if chunk.get("done", False):
                             break
 
-            except json.JSONDecodeError:
-                print("Received invalid JSON from client")
+            except json.JSONDecodeError as e:
+                print(f"JSON Decode Error: {e}")
                 await websocket.send_text("Invalid JSON format")
-            except requests.exceptions.RequestException as e:
-                print(f"Error calling Ollama API: {e}")
-                await websocket.send_text(f"Ollama API error: {e}")
 
     except WebSocketDisconnect:
         print("WebSocket client disconnected")
@@ -78,5 +75,4 @@ async def websocket_endpoint(websocket: WebSocket):
 
 @app.get("/")
 async def root():
-    """Root endpoint to check if the API is running."""
     return {"message": "Ollama WebSocket API is running!"}
