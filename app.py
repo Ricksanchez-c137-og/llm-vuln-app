@@ -49,7 +49,7 @@ async def websocket_endpoint(websocket: WebSocket):
                     and "secret" in lowered_prompt 
                     and "code" in lowered_prompt):
                     secret_msg = f"Secret Code: {SECRET_CODE}"
-                    print(f"⚠️ Prompt injection detected! Revealing secret: {secret_msg}")
+                    print(f"Prompt injection detected! Revealing secret: {secret_msg}")
                     await websocket.send_text(secret_msg)
                     continue
                 response = requests.post(
