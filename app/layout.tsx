@@ -22,7 +22,7 @@ export default function RootLayout({
         <nav className="bg-gray-900 p-4">
           <div className="container mx-auto flex justify-between items-center">
             <Link href="/" className="text-xl font-bold">
-              Dark AI Chat
+              Hosn Chat
             </Link>
             <ul className="flex space-x-4">
               <li>
