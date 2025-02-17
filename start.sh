@@ -11,8 +11,6 @@ done
 
 echo "Pulling AI models..."
 ollama pull mistral
-ollama pull llama2
-ollama pull gemma
 echo "Models loaded successfully!"
 
 # Start FastAPI & Next.js
