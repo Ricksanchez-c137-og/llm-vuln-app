@@ -2,6 +2,7 @@
 echo "ADMIN ONLY"
 echo "Starting Ollama..."
 ollama serve &
+
 until curl -s http://127.0.0.1:11434/api/tags > /dev/null; do
   echo "Waiting for Ollama to start..."
   sleep 2
