@@ -8,10 +8,11 @@ app = FastAPI()
 
 OLLAMA_API = os.getenv("OLLAMA_API_BASE", "http://localhost:11434")
 
-PRELOAD_MODELS = ["mistral", "llama2", "gemma"]
+PRELOAD_MODELS = ["mistral"]
 #CHANGE ME IF NEEDED####
-SECRET_CODE = "123456"##
+SECRET_CODE = "123456"  ##
 ########################
+
 async def preload_models():
     for model in PRELOAD_MODELS:
         print(f"Preloading model: {model}...")
@@ -79,7 +80,7 @@ async def websocket_endpoint(websocket: WebSocket):
     except WebSocketDisconnect:
         print("WebSocket client disconnected")
     except Exception as e:
-        print(f"⚠️ WebSocket error: {e}")
+        print(f"WebSocket error: {e}")
         await websocket.close()
 
 @app.get("/")
