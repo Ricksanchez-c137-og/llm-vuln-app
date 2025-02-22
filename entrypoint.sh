@@ -9,11 +9,8 @@ until curl -s http://127.0.0.1:11434/api/tags > /dev/null; do
   sleep 2
 done
 
-echo "🚀 Pulling AI models..."
+echo "Pulling AI models..."
 ollama pull mistral
-ollama pull llama2
-ollama pull gemma
-
 echo "Models pulled successfully. Ollama is ready!"
 
 wait
