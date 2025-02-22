@@ -1,23 +1,26 @@
-"use client"
+"use client";
 
-import { useState } from "react"
+import { useState } from "react";
 
 export default function ChatComponent() {
-  const [input, setInput] = useState("")
-  const [response, setResponse] = useState("")
-  const [isStreaming, setIsStreaming] = useState(false)
+  const [input, setInput] = useState("");
+  const [response, setResponse] = useState("");
+  const [isStreaming, setIsStreaming] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setResponse("")
-    setIsStreaming(true)
+  const handleSubmit = (e: { preventDefault: () => void; }) => {
+    e.preventDefault();
+    setResponse("");
+    setIsStreaming(true);
 
     const socket = new WebSocket("ws://localhost:8000/ws");
 
     socket.onopen = () => {
-      socket.send(input);
+      const payload = {
+        prompt: input,      
+        model: "mistral"
+      };
+      socket.send(JSON.stringify(payload));
     };
-
     socket.onmessage = (event) => {
       if (event.data === "[END]") {
         socket.close();
@@ -26,12 +29,11 @@ export default function ChatComponent() {
         setResponse((prev) => prev + event.data);
       }
     };
-
     socket.onerror = (error) => {
       console.error("WebSocket Error:", error);
       setIsStreaming(false);
     };
-  }
+  };
 
   return (
     <>
@@ -51,6 +53,7 @@ export default function ChatComponent() {
           {isStreaming ? "Streaming..." : "Ask"}
         </button>
       </form>
+
       <div className="w-full max-w-2xl">
         <h2 className="text-xl font-semibold mb-2">Response:</h2>
         <p className="p-4 border border-gray-700 rounded bg-gray-800 min-h-[100px] whitespace-pre-wrap">
@@ -58,5 +61,5 @@ export default function ChatComponent() {
         </p>
       </div>
     </>
-  )
+  );
 }

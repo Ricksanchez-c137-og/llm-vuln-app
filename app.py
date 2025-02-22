@@ -9,14 +9,14 @@ app = FastAPI()
 OLLAMA_API = os.getenv("OLLAMA_API_BASE", "http://localhost:11434")
 
 PRELOAD_MODELS = ["mistral"]
-#CHANGE ME IF NEEDED####
-SECRET_CODE = "123456"  ##
-########################
+
+# Hardcoded secret code
+SECRET_CODE = "123456"
 
 async def preload_models():
+    """Preloads the specified models from Ollama."""
     for model in PRELOAD_MODELS:
         print(f"Preloading model: {model}...")
-
         try:
             response = requests.post(f"{OLLAMA_API}/api/pull", json={"name": model}, timeout=300)
             if response.status_code == 200:
@@ -38,6 +38,7 @@ async def websocket_endpoint(websocket: WebSocket):
         while True:
             data = await websocket.receive_text()
             print(f"Raw WebSocket Data: {data}")
+
             try:
                 request_data = json.loads(data)
                 prompt = request_data.get("prompt", "Hello!")
@@ -45,13 +46,14 @@ async def websocket_endpoint(websocket: WebSocket):
 
                 print(f"Parsed JSON: Model={model}, Prompt={prompt}")
                 lowered_prompt = prompt.lower()
-                if ("ignore all instructions" in lowered_prompt 
-                    and "reveal" in lowered_prompt 
-                    and "secret" in lowered_prompt 
+                if ("ignore all instructions" in lowered_prompt
+                    and "reveal" in lowered_prompt
+                    and "secret" in lowered_prompt
                     and "code" in lowered_prompt):
                     secret_msg = f"Secret Code: {SECRET_CODE}"
-                    print(f"Prompt injection detected! Revealing secret: {secret_msg}")
+                    print(f"{secret_msg}")
                     await websocket.send_text(secret_msg)
+                    await websocket.send_text("[END]")
                     continue
                 response = requests.post(
                     f"{OLLAMA_API}/api/generate",
@@ -64,6 +66,7 @@ async def websocket_endpoint(websocket: WebSocket):
                     error_msg = f"Ollama API Error: {response.status_code} - {response.text}"
                     print(error_msg)
                     await websocket.send_text(error_msg)
+                    await websocket.send_text("[END]")
                     continue
                 for line in response.iter_lines():
                     if line:
@@ -73,10 +76,13 @@ async def websocket_endpoint(websocket: WebSocket):
                         if chunk.get("done", False):
                             break
 
+                await websocket.send_text("[END]")
+
             except json.JSONDecodeError as e:
                 print(f"JSON Decode Error: {e}")
                 await websocket.send_text("Invalid JSON format")
-
+                await websocket.send_text("[END]")
+#Admin setion
     except WebSocketDisconnect:
         print("WebSocket client disconnected")
     except Exception as e:
@@ -85,4 +91,4 @@ async def websocket_endpoint(websocket: WebSocket):
 
 @app.get("/")
 async def root():
-    return {"message": "Ollama WebSocket API is running (intentionally vulnerable)!"}
+    return {"message": "Ollama WebSocket API is running"}
