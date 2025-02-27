@@ -14,13 +14,12 @@ PRELOAD_MODELS = ["mistral"]
 SECRET_CODE = "123456"
 
 async def preload_models():
-    """Preloads the specified models from Ollama."""
     for model in PRELOAD_MODELS:
         print(f"Preloading model: {model}...")
         try:
             response = requests.post(f"{OLLAMA_API}/api/pull", json={"name": model}, timeout=300)
             if response.status_code == 200:
-                print(f"Model {model} preloaded successfully!")
+                print(f"Model {model} preloaded successfully")
             else:
                 print(f"Failed to preload {model}: {response.status_code} - {response.text}")
         except requests.exceptions.RequestException as e:
