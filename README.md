@@ -16,13 +16,13 @@ then change directory to the folder of the repo
 to pull the image you can easily do that using this command 
 
 ```bash 
-    sudo docker pull vaxenee/hosn-llm
+    sudo docker pull vaxenee/hosn-llm:latest
 ```
 
 then you can run  it normally using the comamnd below 
 
 ```bash 
-sudo docker run -it -p 80:80 -p 8000:8000 -p 11434:11434 vaxenee/hosn-llm
+sudo docker run -it -p 80:80 -p 8000:8000 -p 11434:11434 vaxenee/hosn-llm:latest
 ```
 
 once the machine has started give it 5 mins to fully pull the AI models images and to set up everything. 
