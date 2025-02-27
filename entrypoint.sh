@@ -12,5 +12,4 @@ done
 echo "Pulling AI models..."
 ollama pull mistral
 echo "Models pulled successfully. Ollama is ready!"
-
 wait
