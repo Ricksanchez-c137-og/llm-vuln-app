@@ -12,7 +12,7 @@ RUN apt-get update && apt-get install -y \
 
 RUN curl -fsSL https://deb.nodesource.com/setup_current.x | bash - && \
     apt-get install -y nodejs && \
-    node -v && npm -v  # Verify installation
+    node -v && npm -v
 RUN curl -fsSL https://ollama.com/install.sh | sh
 
 ENV PATH="/root/.ollama/bin:$PATH"
